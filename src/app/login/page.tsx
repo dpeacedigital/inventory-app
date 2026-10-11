@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, User, ShieldCheck, KeyRound } from "lucide-react";
+import { Lock, Mail, User, ShieldCheck, KeyRound, CheckCircle2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,16 +11,47 @@ export default function LoginPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const resetFormFields = () => {
+    setPassword("");
+    setConfirmPassword("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+    setError("");
+    setSuccess("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
+    if (mode === "register") {
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+      if (password.length < 6) {
+        setError("Password must be at least 6 characters long");
+        return;
+      }
+    }
+
     if (mode === "forgot") {
+      if (newPassword !== confirmNewPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+      if (newPassword.length < 6) {
+        setError("New password must be at least 6 characters long");
+        return;
+      }
+
       try {
         const res = await fetch("/api/auth/reset-password", {
           method: "POST",
@@ -32,8 +63,7 @@ export default function LoginPage() {
         if (res.ok) {
           setSuccess("Password updated successfully! You can now log in.");
           setMode("login");
-          setPassword("");
-          setNewPassword("");
+          resetFormFields();
         } else {
           setError(data.error || "Password reset failed");
         }
@@ -58,6 +88,7 @@ export default function LoginPage() {
         if (mode === "register") {
           setMode("login");
           setSuccess("Account created successfully! Please sign in.");
+          resetFormFields();
         } else {
           router.push("/");
           router.refresh();
@@ -85,7 +116,7 @@ export default function LoginPage() {
           <p className="text-sm text-slate-500 mt-1">
             {mode === "register" && "Register to buy goods and track orders"}
             {mode === "login" && "Enter your email and password to continue"}
-            {mode === "forgot" && "Enter your email and a new password"}
+            {mode === "forgot" && "Enter your email and choose a new password"}
           </p>
         </div>
 
@@ -134,23 +165,20 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {mode !== "forgot" ? (
+          {mode === "login" && (
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-semibold uppercase text-slate-600">Password</label>
-                {mode === "login" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("forgot");
-                      setError("");
-                      setSuccess("");
-                    }}
-                    className="text-xs text-emerald-600 hover:underline font-medium"
-                  >
-                    Forgot Password?
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("forgot");
+                    resetFormFields();
+                  }}
+                  className="text-xs text-emerald-600 hover:underline font-medium"
+                >
+                  Forgot Password?
+                </button>
               </div>
               <div className="relative">
                 <Lock className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
@@ -164,21 +192,74 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-          ) : (
-            <div>
-              <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">New Password</label>
-              <div className="relative">
-                <Lock className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  required
-                  type="password"
-                  placeholder="Enter new password (min. 6 chars)"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
+          )}
+
+          {mode === "register" && (
+            <>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Password</label>
+                <div className="relative">
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    required
+                    type="password"
+                    placeholder="Min. 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                  />
+                </div>
               </div>
-            </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Confirm Password</label>
+                <div className="relative">
+                  <CheckCircle2 className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    required
+                    type="password"
+                    placeholder="Re-enter password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {mode === "forgot" && (
+            <>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">New Password</label>
+                <div className="relative">
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    required
+                    type="password"
+                    placeholder="Min. 6 characters"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Confirm New Password</label>
+                <div className="relative">
+                  <CheckCircle2 className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    required
+                    type="password"
+                    placeholder="Re-enter new password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           <button
@@ -197,8 +278,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => {
                 setMode("login");
-                setError("");
-                setSuccess("");
+                resetFormFields();
               }}
               className="text-emerald-600 font-semibold hover:underline"
             >
@@ -211,8 +291,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => {
                   setMode("login");
-                  setError("");
-                  setSuccess("");
+                  resetFormFields();
                 }}
                 className="text-emerald-600 font-semibold hover:underline"
               >
@@ -226,8 +305,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => {
                   setMode("register");
-                  setError("");
-                  setSuccess("");
+                  resetFormFields();
                 }}
                 className="text-emerald-600 font-semibold hover:underline"
               >
