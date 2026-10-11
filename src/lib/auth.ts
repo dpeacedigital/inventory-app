@@ -27,7 +27,7 @@ export async function getUserSession() {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(SECRET, token);
+    const { payload } = await jwtVerify(token, SECRET);
     return payload as { id: string; email: string; role: string; name: string };
   } catch {
     return null;
