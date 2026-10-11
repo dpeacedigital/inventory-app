@@ -4,7 +4,7 @@ import { hashPassword } from "@/src/lib/auth";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, role } = await req.json();
+    const { name, email, password } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -16,16 +16,14 @@ export async function POST(req: Request) {
     }
 
     const hashedPassword = await hashPassword(password);
-    
-    // Default to CUSTOMER if role is not specified or invalid
-    const assignedRole = ["ADMIN", "STAFF", "CUSTOMER"].includes(role) ? role : "CUSTOMER";
 
+    // Strict rule: Any public sign-up is always assigned CUSTOMER role
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: assignedRole,
+        role: "CUSTOMER",
       },
       select: {
         id: true,
@@ -36,7 +34,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ user }, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Registration failed" }, { status: 500 });
   }
 }
