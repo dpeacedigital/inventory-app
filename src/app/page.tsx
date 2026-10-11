@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { 
   Package, 
   DollarSign, 
   AlertTriangle, 
   Plus, 
   Search, 
-  Layers 
+  ShoppingCart,
+  UserCheck
 } from "lucide-react";
 
 interface Product {
@@ -112,23 +114,39 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-50 p-6 md:p-10 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* Top Header */}
+        {/* Navigation & Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
               Inventory Management
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Live stock levels, valuation, and store analytics
+              Live stock levels, inventory valuation, and sales operations
             </p>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm transition"
-          >
-            <Plus className="w-5 h-5" />
-            Add New Product
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/sales"
+              className="inline-flex items-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-lg shadow-sm transition text-sm"
+            >
+              <ShoppingCart className="w-4 h-4 text-emerald-600" />
+              Sales Terminal
+            </Link>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-lg shadow-sm transition text-sm"
+            >
+              <UserCheck className="w-4 h-4 text-slate-600" />
+              Staff Login
+            </Link>
+            <button
+              onClick={() => setShowModal(true)}
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm transition text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Product
+            </button>
+          </div>
         </div>
 
         {/* Analytics Summary Cards */}
@@ -176,7 +194,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Filter */}
         <div className="relative">
           <Search className="w-5 h-5 text-slate-400 absolute left-3 top-3" />
           <input
@@ -188,7 +206,7 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Product Table */}
+        {/* Products Table */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
@@ -213,7 +231,7 @@ export default function Dashboard() {
                 ) : filteredProducts.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center py-8 text-slate-400">
-                      No products found. Add your first product above.
+                      No products found. Add your first product using the button above.
                     </td>
                   </tr>
                 ) : (
@@ -263,7 +281,7 @@ export default function Dashboard() {
 
       </div>
 
-      {/* Product Creation Modal */}
+      {/* Add Product Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-lg p-6">
@@ -345,7 +363,7 @@ export default function Dashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Low Stock Limit</label>
+                  <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Low Stock Alert Limit</label>
                   <input
                     type="number"
                     placeholder="5"
