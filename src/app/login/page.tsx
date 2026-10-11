@@ -11,7 +11,6 @@ export default function LoginPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("STAFF");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,7 +18,7 @@ export default function LoginPage() {
     setError("");
 
     const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
-    const payload = isRegister ? { name, email, password, role } : { email, password };
+    const payload = isRegister ? { name, email, password } : { email, password };
 
     try {
       const res = await fetch(endpoint, {
@@ -32,7 +31,7 @@ export default function LoginPage() {
       if (res.ok) {
         if (isRegister) {
           setIsRegister(false);
-          alert("Account created successfully! Please log in.");
+          alert("Account created successfully! Please sign in.");
         } else {
           router.push("/");
           router.refresh();
@@ -53,10 +52,10 @@ export default function LoginPage() {
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">
-            {isRegister ? "Create an Account" : "Sign In to Inventory"}
+            {isRegister ? "Create Customer Account" : "Sign In to Store"}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            {isRegister ? "Register an admin, staff or customer profile" : "Enter your credentials to continue"}
+            {isRegister ? "Register to buy goods and track orders" : "Enter your email and password to continue"}
           </p>
         </div>
 
@@ -91,7 +90,7 @@ export default function LoginPage() {
               <input
                 required
                 type="email"
-                placeholder="name@company.com"
+                placeholder="name@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
@@ -114,31 +113,16 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {isRegister && (
-            <div>
-              <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
-              >
-                <option value="STAFF">Staff (Sales & Inventory)</option>
-                <option value="ADMIN">Admin (Full Control)</option>
-                <option value="CUSTOMER">Customer</option>
-              </select>
-            </div>
-          )}
-
           <button
             type="submit"
             className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-sm transition mt-2"
           >
-            {isRegister ? "Register Account" : "Sign In"}
+            {isRegister ? "Create Customer Account" : "Sign In"}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-slate-600">
-          {isRegister ? "Already have an account? " : "Need an account? "}
+          {isRegister ? "Already have an account? " : "New customer? "}
           <button
             type="button"
             onClick={() => {
@@ -153,7 +137,7 @@ export default function LoginPage() {
 
         <div className="mt-4 text-center">
           <Link href="/" className="text-xs text-slate-400 hover:underline">
-            Back to Dashboard
+            Back to Storefront
           </Link>
         </div>
       </div>
